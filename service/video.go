@@ -119,7 +119,7 @@ func (s *videoService) DownloadVideo(listfile []string, payload queuepayload.Que
 	}
 
 	url := fmt.Sprintf(
-		"http://%s:%s/api/v1/video/%s/%s/%s_%s0.m3u8",
+		"http://%s:%s/api/v1/video/%s/%s/%s_%s.m3u8",
 		config.GetAppHost(),
 		config.GetAppPort(),
 		payload.Uuid,
