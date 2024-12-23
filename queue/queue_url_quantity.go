@@ -1,10 +1,10 @@
 package queue
 
 import (
-	"app/config"
-	"app/constant"
-	"app/dto/queuepayload"
-	"app/service"
+	"app/cmd/video-hls-service/service"
+	"app/internal/connection"
+	constant "app/internal/constants"
+	queuepayload "app/internal/dto/queue_payload"
 	"encoding/json"
 	"log"
 
@@ -12,7 +12,7 @@ import (
 )
 
 type queueFileM3U8 struct {
-	videoService service.VideoService
+	service service.Service
 }
 
 type QueueFileM3U8 interface {
@@ -20,7 +20,7 @@ type QueueFileM3U8 interface {
 }
 
 func (q *queueFileM3U8) Worker() {
-	conn := config.GetRabbitmq()
+	conn := connection.GetRabbitmq()
 	ch, err := conn.Channel()
 	if err != nil {
 		log.Println("error chanel: ", err)
@@ -59,20 +59,21 @@ func (q *queueFileM3U8) Worker() {
 		go func(mess amqp091.Delivery) {
 			var payload queuepayload.QueueFileM3U8Payload
 			err := json.Unmarshal(mess.Body, &payload)
+
 			if err != nil {
 				log.Println("error msg: ", err)
 				mess.Reject(true)
 				return
 			}
 
-			listFile, err := q.videoService.GetListVideo(payload)
+			listFile, err := q.service.VideoService.GetListVideo(payload)
 			if err != nil {
 				log.Println("error get list file: ", err)
 				mess.Reject(true)
 				return
 			}
 
-			err = q.videoService.DownloadVideo(listFile, payload)
+			err = q.service.VideoService.DownloadVideo(listFile, payload)
 			if err != nil {
 				log.Println("error download video: ", err)
 				mess.Reject(true)
@@ -86,6 +87,6 @@ func (q *queueFileM3U8) Worker() {
 
 func NewQueueFileM3U8() QueueFileM3U8 {
 	return &queueFileM3U8{
-		videoService: service.NewVideoService(),
+		service: service.Register(),
 	}
 }
