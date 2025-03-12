@@ -14,7 +14,7 @@ func (h *fileHandle) FileHls(ctx *gin.Context) {
 	uuid := ctx.Param("uuid")
 	quantity := ctx.Param("quantity")
 	filename := ctx.Param("filename")
-	filepath := fmt.Sprintf("cmd/video-hls-service/data/video/%s/%s/%s", uuid, quantity, filename)
+	filepath := fmt.Sprintf("data/video/%s/%s/%s", uuid, quantity, filename)
 
 	if _, err := os.Stat(filepath); os.IsNotExist(err) {
 		logapp.Logger("get-file-hls", err.Error(), constant.ERROR_LOG)
