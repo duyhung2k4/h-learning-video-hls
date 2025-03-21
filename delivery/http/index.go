@@ -31,6 +31,5 @@ func Register() http.Handler {
 		connection.GetConnect().VideoHlsService.Host,
 		connection.GetConnect().VideoHlsService.Port,
 	)
-
 	return r
 }
